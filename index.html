@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Link Manager</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+}
+.link {
+  margin: 10px 0;
+}
+.lock {
+  background-color: #4CAF50;
+  color: white;
+}
+.open {
+  background-color: #008CBA;
+  color: white;
+}
+.up {
+  background-color: #f44336;
+  color: white;
+}
+.down {
+  background-color: #e7e7e7;
+  color: black;
+}
+.delete {
+  background-color: #555555;
+  color: white;
+}
+</style>
+</head>
+<body>
+<h1>Manage Your Links</h1>
+<form id='link-form'>
+<label for='title'>Title:</label><br>
+<input type='text' id='title' name='title'><br>
+<label for='url'>URL:</label><br>
+<input type='text' id='url' name='url' required><br>
+<input type='submit' value='Save'>
+</form>
+<div id='link-list'></div>
+<script>
+let list = document.getElementById('link-list');
+
+document.getElementById('link-form').onsubmit = function(e) {
+e.preventDefault();
+
+let title = document.getElementById('title').value;
+let url = document.getElementById('url').value;
+
+if (title === '') {
+  title = url;
+}
+
+let linkDiv = document.createElement('div');
+linkDiv.className = 'link';
+
+const html = `<h2>${title}</h2>
+<button class='lock' type='button'>Lock</button>
+<button class='open' type='button' onclick='openLink(this.previousElementSibling, \"${url}\")'>Open Link</button>
+<button class='up' type='button'>Up</button>
+<button class='down' type='button'>Down</button>
+<button class='delete' type='button'>Delete</button>
+`;
+
+linkDiv.innerHTML = html;
+list.appendChild(linkDiv);
+}
+
+function openLink(lockButton, url) {
+  if (lockButton.textContent === "Unlock") {
+    let password = prompt('Enter password to unlock and open the link:');
+    if (password === lockButton.dataset.password) {
+      window.open(url, "_blank");
+    } else {
+      alert('Wrong password!');
+    }
+  } else { 
+    window.open(url, "_blank");
+  }
+}
+
+list.onclick = function (e) { 
+    let target = e.target; 
+
+    if (target.className === 'up') { 
+        let div = target.parentElement; 
+        let prevDiv = div.previousElementSibling; 
+        if (prevDiv) list.insertBefore(div, prevDiv); 
+    } else if (target.className === 'down') { 
+        let div = target.parentElement; 
+        let nextDiv = div.nextElementSibling; 
+        if (nextDiv) list.insertBefore(nextDiv, div); 
+    } else if (target.className === 'delete') { 
+        let div = target.parentElement; 
+        list.removeChild(div); 
+    } else if (target.className === 'lock') {
+        if (target.textContent === 'Lock') {
+            let password = prompt('Enter password:');
+            if (password != null) {
+                target.dataset.password = password;
+                target.textContent = 'Unlock';
+                alert('Link locked with password!');
+            }
+        } else if (target.textContent === 'Unlock') {
+            let password = prompt('Enter password to unlock:');
+            if (password === target.dataset.password) {
+                delete target.dataset.password;
+                target.textContent = 'Lock';
+                alert('Link successfully unlocked!');
+            } else {
+                alert('Wrong password!');
+            }
+        }
+    }
+}
+</script>
+</body>
+</html>
